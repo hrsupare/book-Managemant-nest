@@ -10,8 +10,8 @@ export class UserController {
         return this.userService.create(createUserDto)
     }
 
-    @Get()
-    getAll() {
+    @Get() 
+    getAll() { 
         return this.userService.getAll()
     }
 
