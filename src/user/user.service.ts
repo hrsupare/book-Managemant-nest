@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { response } from 'express';
 import { Model } from 'mongoose';
 import { UserDocument } from './schema/user.schema';
 
@@ -14,6 +15,21 @@ export class UserService {
             .catch((err) => { console.log(err) })
     }
 
+
+    async login(credentials) {
+        const { email, password } = credentials
+        const checkUser = await this.userModel.findOne({ "email": email })
+        if (checkUser) {
+            if (checkUser.password !== password) {
+                return new HttpException("Wrong Password", HttpStatus.UNAUTHORIZED)
+            } else {
+                return { token: 1 }
+            }
+        } else {
+            return new HttpException("User Not Found", HttpStatus.NOT_FOUND)
+        }
+
+    }
     async getAll() {
         return this.userModel.find()
             .then((data) => { return data })
@@ -28,7 +44,7 @@ export class UserService {
 
     async updateUser(id, data) {
         return this.userModel.findByIdAndUpdate({ "_id": id }, data, { new: true })
-            .then((data) => { return data })
+            .then((data) => { return })
             .catch((err) => { console.log(err) })
 
     }
