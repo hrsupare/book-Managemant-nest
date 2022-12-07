@@ -1,9 +1,12 @@
-import { Controller, Post, Body, Get, Param, Put, UsePipes, ValidationPipe, Header, Response, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, UsePipes, ValidationPipe, Header, Response, HttpStatus, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, ParamsId, UpdateUserDto, LoginUserDto } from './dto/user.dto';
+import { AuthGuard } from 'src/guard/auth.guard';
+import * as dotenv from 'dotenv' 
+dotenv.config()
+
 
 @Controller('user')
-
 export class UserController {
     constructor(private readonly userService: UserService) { }
     @Post()
@@ -15,14 +18,14 @@ export class UserController {
 
     @Post("login")
     @UsePipes(ValidationPipe)
-    @Header("X-API-TOKEN", "asdf")
     login(@Body() loginUserDto: LoginUserDto,) {
         return this.userService.login(loginUserDto)
             .then((data) => { return data })
-            .catch((err) => { console.log(err) })
+            .catch((err) => { return err })
     }
 
     @Get()
+    @UseGuards(AuthGuard)
     getAll() {
         return this.userService.getAll()
     }
